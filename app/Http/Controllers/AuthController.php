@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 
 class AuthController extends Controller
@@ -64,7 +65,7 @@ class AuthController extends Controller
                 return response()->json([
                     'access_token' => $token,
                     'token_type' => 'Bearer',
-                ]);
+                ]); 
             }else{
                 return response()->json([
                     'success' => false,
@@ -85,5 +86,9 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'Logout successfully'
         ]);
+    }
+
+    public function cek(Request $request){
+        return response()->json($request->user());
     }
 }

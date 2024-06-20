@@ -10,12 +10,16 @@ use Illuminate\Support\Facades\Validator;
 
 class TodoController extends Controller
 {
+    public $dataUser;
+    public function __construct(Request $request){
+        $this->dataUser=$request->user();
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $response=Todolist::all();
+        $response=Todolist::where('id_user',$this->dataUser->id)->get();
         if ($response->count()>0){
             return response()->json(
                 [
@@ -46,7 +50,7 @@ class TodoController extends Controller
             'activity'=>'required',
             'description'=>'required',
             'deadline'=>'required',
-            'taskStatus'=>'required'
+            // 'taskStatus'=>'required'
         ]);
         if ($validator->fails()){
             return response()->json($validator->errors(), 422);
@@ -55,7 +59,8 @@ class TodoController extends Controller
             'activity'=>$request->activity,
             'description'=>$request->description,
             'deadline'=>$request->deadline,
-            'taskStatus'=>$request->taskStatus
+            'id_user'=>$this->dataUser->id,
+            // 'taskStatus'=>$request->taskStatus
         ]);
         if ($data) {
             return response()->json(
@@ -84,6 +89,7 @@ class TodoController extends Controller
     public function show(string $id)
     {
         $data=Todolist::where('id',$id)
+        ->where('id_user',$this->dataUser->id)
         ->orWhere('activity','like','%'.$id.'%')
         ->get();
 
@@ -190,6 +196,7 @@ class TodoController extends Controller
         $data->activity=$request->activity;
         $data->description=$request->description;
         $data->taskStatus=$request->taskStatus;
+        $data->id_user = $this->dataUser->id;
         $data->save();
         if ($data) {
             return response()->json(

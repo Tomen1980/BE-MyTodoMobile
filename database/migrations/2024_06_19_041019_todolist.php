@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('todolist', function (Blueprint $table) {
             $table->id();
+            // $table->bigInteger('id_user');
             $table->string('activity');
             $table->string('description');
             $table->dateTime('deadline');
-            $table->string('taskStatus');
+            // $table->string('taskStatus');
+            $table->enum('taskStatus', ['todo', 'doing', 'done'])->default('todo');
             $table->timestamps();
+            $table->foreignId('id_user')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

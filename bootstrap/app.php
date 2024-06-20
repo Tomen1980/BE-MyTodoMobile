@@ -19,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             // 'abilities' => CheckAbilities::class,
             // 'ability' => CheckForAnyAbility::class,
-            'validateSanctum' => ValidateSanctumToken::class,
+            'ValidateSanctumToken' => ValidateSanctumToken::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

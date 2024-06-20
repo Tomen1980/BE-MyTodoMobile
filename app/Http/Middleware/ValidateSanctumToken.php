@@ -5,8 +5,10 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\PersonalAccessToken;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+// use Laravel\Sanctum\PersonalAccessToken;
 
 class ValidateSanctumToken
 {
@@ -17,37 +19,34 @@ class ValidateSanctumToken
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // // Ambil token dari header Authorization
-        // $token = $request->bearerToken();
+        // Periksa apakah ada token dalam header Authorization
+        $token = $request->bearerToken();
 
-        // if (!$token) {
-        //     return response()->json(['message' => 'Token not provided'], 401);
-        // }
+        if (!$token) {
+            // Jika tidak ada token, kembalikan pesan kesalahan
+            return response()->json(['message' => 'Token not provided. Please login.'], 401);
+        }
 
-        // // Cek apakah token valid
-        // $accessToken = PersonalAccessToken::findToken($token);
+        // Cek apakah token valid dan dapatkan token modelnya
+        $accessToken = PersonalAccessToken::findToken($token);
 
-        // if (!$accessToken) {
-        //     return response()->json(['message' => 'Invalid token'], 401);
-        // }
+        if (!$accessToken) {
+            return response()->json(['message' => 'Invalid token.'], 401);
+        }
 
-        // // Jika token valid, lanjutkan permintaan
-        // return $next($request);
+        // Dapatkan pengguna terkait dengan token
+        $user = $accessToken->tokenable;
 
-         // Periksa apakah ada token dalam header Authorization
-         $token = $request->bearerToken();
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
 
-         if (!$token) {
-             // Jika tidak ada token, kembalikan pesan kesalahan
-             return response()->json(['message' => 'Token not provided. Please login.'], 401);
-         }
- 
-         // Cek apakah token valid
-         if (!Auth::guard('sanctum')->check()) {
-             return response()->json(['message' => 'Invalid token or user not authenticated.'], 401);
-         }
- 
-         // Jika token valid, lanjutkan permintaan
-         return $next($request);
+        // Set pengguna ke dalam request sehingga tersedia di permintaan berikutnya
+        $request->setUserResolver(function () use ($user) {
+            return $user;
+        });
+
+        // Lanjutkan permintaan
+        return $next($request);
     }
 }

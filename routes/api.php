@@ -13,9 +13,10 @@ Route::post('/registrasi', [AuthController::class, 'registrasi']);
 Route::post('/login', [AuthController::class, 'login']);
 
 
-Route::group(['middleware' => 'auth:sanctum'], function () {
+Route::group(['middleware' => 'ValidateSanctumToken'], function () {
     // Route::apiResource('todos', TodoController::class);
+    Route::get("/cek",[AuthController::class, 'cek']);
     Route::delete('/logout', [AuthController::class, 'logout']);
+    Route::apiResource('/todolist',TodoController::class);
 });
-Route::apiResource('/todolist',TodoController::class);
 Route::put('/todolist/{id}/change',[TodoController::class, 'change']);
