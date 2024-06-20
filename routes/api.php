@@ -14,6 +14,8 @@ Route::post('/login', [AuthController::class, 'login']);
 
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::apiResource('todos', TodoController::class);
+    // Route::apiResource('todos', TodoController::class);
     Route::delete('/logout', [AuthController::class, 'logout']);
 });
+Route::apiResource('/todolist',TodoController::class);
+Route::put('/todolist/{id}/change',[TodoController::class, 'change']);
